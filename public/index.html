@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/styles/theme.css">
+    <link rel="stylesheet" href="assets/styles/style.css">
+</head>
+
+<body>
+    <div class="app">
+        <div class="screen join-screen active">
+            <div class="form">
+                <h2>Join Chat</h2>
+                <div class="form-input">
+                    <label>Username</label>
+                    <input type="text" id="username">
+                </div>
+                <div class="form-input"><button id="join-user">Join</button>
+                </div>
+            </div>
+        </div>
+        <div class="screen chat-screen ">
+            <div class="header">
+                <div class="logo">dynwave</div>
+                <!-- Corrected ID here -->
+                <button id="exit-chat">Sign Out</button>
+            </div>
+            <div class="messages">
+            </div>
+            <div class="typebox">
+                <input type="text" id="msg-input">
+                <button id="send-msg">Send</button>
+            </div>
+        </div>
+    </div>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
