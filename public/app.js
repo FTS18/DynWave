@@ -3,8 +3,8 @@
     const socket = io();
     let uname;
 
-    app.querySelector(".join-screen #join-user").addEventListener("click", function () {
-        let username = app.querySelector(".join-screen #username").value;
+    app.querySelector("#join-user").addEventListener("click", function () {
+        let username = app.querySelector("#username").value;
         if (username.length == 0) {
             return;
         }
@@ -14,21 +14,26 @@
         app.querySelector(".chat-screen").classList.add("active");
     });
 
-    app.querySelector(".chat-screen #send-msg").addEventListener("click", function () {
-        let message = app.querySelector(".chat-screen #msg-input").value;
-        if (message.length == 0) {
-            return;
+    const msgInput = app.querySelector("#msg-input");
+
+    msgInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendMessage();
         }
-
-        renderMessage("my", { username: uname, text: message });
-        socket.emit("chat", { username: uname, text: message });
-
-        app.querySelector(".chat-screen #msg-input").value = '';
     });
 
-    app.querySelector(".chat-screen #exit-chat").addEventListener("click", function () {
+    app.querySelector("#send-msg").addEventListener("click", sendMessage);
+
+    app.querySelector("#exit-chat").addEventListener("click", function () {
         socket.emit("exituser", uname);
         window.location.href = window.location.href;
+    });
+
+    socket.on("chatHistory", function (chatHistory) {
+        chatHistory.forEach((message) => {
+            renderMessage(message.username === uname ? 'my' : 'other', message);
+        });
     });
 
     socket.on("update", function (update) {
@@ -36,31 +41,78 @@
     });
 
     socket.on("chat", function (message) {
-        renderMessage("other", message);
+        if (message.username !== uname) {
+            // Render the message only if it's not from the current user
+            renderMessage("other", message);
+        }
     });
 
+    function sendMessage() {
+        let message = msgInput.value;
+        if (message.length == 0) {
+            return;
+        }
+
+        // Render the "my" message only if it's not a duplicate
+        if (msgInput.value !== msgInput.getAttribute('data-last-message')) {
+            renderMessage("my", { username: uname, text: message });
+            socket.emit("chat", { username: uname, text: message });
+            msgInput.setAttribute('data-last-message', msgInput.value);
+        }
+
+        msgInput.value = '';
+    }
     function renderMessage(type, content) {
         let messageContainer = app.querySelector(".chat-screen .messages");
         let el = document.createElement('div');
-
+        let messageClass, nameClass;
+    
         if (type === 'my') {
-            el.className = "message my-message";
-            el.innerHTML = `<div>
-                <div class='name'>You</div>
-                <div class='text'>${content.text}</div>
-            </div>`;
+            messageClass = "my-message";
+            nameClass = "name-my";
         } else if (type === "other") {
-            el.className = "message other-message";
-            el.innerHTML = `<div>
-                <div class='name'>${content.username}</div>
-                <div class='text'>${content.text}</div>
-            </div>`;
+            messageClass = "other-message";
+            nameClass = "name-other";
         } else if (type === "update") {
-            el.className = "update";
-            el.innerText = content;
+            messageClass = "update";
+            nameClass = "name-update";
         }
-
+    
+        const isCurrentUser = type === 'my';
+    
+        const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+        el.className = `message ${messageClass} ${isCurrentUser ? 'current-user' : ''}`;
+        el.innerHTML = `<div>
+            <div class='${nameClass}' style='color: ${getUsernameColor(content.username)}'>${content.username}</div>
+            <div class='text'>${content.text}</div>
+            <div class='timestamp ${isCurrentUser ? 'right' : 'left'}'>${timestamp}</div>
+        </div>`;
+    
         messageContainer.appendChild(el);
         messageContainer.scrollTop = messageContainer.scrollHeight - messageContainer.clientHeight;
+    }
+    
+
+    function getUsernameColor(username) {
+        // Use a hash function to generate a deterministic color based on the username
+        const hash = hashCode(username);
+        const color = intToRGB(hash);
+        return color;
+    }
+
+    function hashCode(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return hash;
+    }
+
+    function intToRGB(i) {
+        const c = (i & 0x00FFFFFF)
+            .toString(16)
+            .toUpperCase();
+        return "#" + "00000".substring(0, 6 - c.length) + c;
     }
 })();
