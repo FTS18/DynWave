@@ -1,0 +1,47 @@
+[
+  {
+    "username": "admin",
+    "chatHistory": [
+      {
+        "username": "system",
+        "text": "admin joined the conversation",
+        "timestamp": "05:51 pm"
+      },
+      {
+        "username": "admin",
+        "text": "hi",
+        "timestamp": "06:15 pm"
+      }
+    ]
+  },
+  {
+    "username": "ananay",
+    "chatHistory": [
+      {
+        "username": "system",
+        "text": "ananay joined the conversation",
+        "timestamp": "06:15 pm"
+      },
+      {
+        "username": "ananay",
+        "text": "ok",
+        "timestamp": "06:15 pm"
+      }
+    ]
+  },
+  {
+    "username": "dubeyananay@gmail.co",
+    "chatHistory": [
+      {
+        "username": "system",
+        "text": "dubeyananay@gmail.co joined the conversation",
+        "timestamp": "06:16 pm"
+      },
+      {
+        "username": "dubeyananay@gmail.co",
+        "text": "hi",
+        "timestamp": "06:16 pm"
+      }
+    ]
+  }
+]
